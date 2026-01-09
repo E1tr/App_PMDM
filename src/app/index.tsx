@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { TextInput, Button, Text, Avatar, Divider } from 'react-native-paper'
+import { useRouter } from 'expo-router';
 
 
-export default function LogInScreen() {
+export default function LogInScreen({ navigation }: any) {
     // Estás dos constantes se encargan de almacenar el email y la contraseña que el usuario manda en los inputs, esto se hace con useState
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [showPassword, setShowPassword] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
+
 
     return (
         <View style={styles.container}>
@@ -62,7 +65,7 @@ export default function LogInScreen() {
 
             <Button
                 mode='contained'
-                onPress={() => { }}
+                onPress={() => { router.replace('/(tabs)') }}
                 style={styles.loginButton}
                 contentStyle={{ height: 50 }}
             >
