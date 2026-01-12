@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { TextInput, Button, Text, Avatar, Divider } from 'react-native-paper'
 import { useRouter } from 'expo-router';
+import { COLORS } from '../constants/theme';
 
 
 export default function LogInScreen({ navigation }: any) {
-    // Estás dos constantes se encargan de almacenar el email y la contraseña que el usuario manda en los inputs, esto se hace con useState
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +19,7 @@ export default function LogInScreen({ navigation }: any) {
                     size={80}
                     icon="lock-outline"
                     style={styles.avatar}
-                    color="#5c5cff"
+                    color={COLORS.primary}
                 />
 
             </View>
@@ -36,7 +36,7 @@ export default function LogInScreen({ navigation }: any) {
                     outlineStyle={styles.input}
                     style={styles.input}
                     left={<TextInput.Icon icon="email-outline" color="#aaa" />}
-                    theme={{ colors: { primary: '#5c5cff', outline: '#E0E0E0' } }}
+                    theme={{ colors: { primary: COLORS.primary, outline: '#E0E0E0' } }}
                 />
                 <View style={styles.passwordHeader}>
                     <Text style={styles.label}>Contraseña</Text>
@@ -58,7 +58,7 @@ export default function LogInScreen({ navigation }: any) {
                             color="#aaa"
                         />
                     }
-                    theme={{ colors: { primary: '#5c5cff', outline: '#E0E0E0' } }}
+                    theme={{ colors: { primary: COLORS.primary, outline: '#E0E0E0' } }}
                 />
             </View>
 
@@ -110,17 +110,17 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     avatar: {
-        backgroundColor: '#E8EAF6', // Fondo lila muy clarito
+        backgroundColor: '#E8EAF6',
     },
     title: {
         textAlign: 'center',
         fontWeight: 'bold',
-        color: '#1a1b4b',
+        color: COLORS.text,
         marginBottom: 8,
     },
     subtitle: {
         textAlign: 'center',
-        color: '#7e7e7e',
+        color: COLORS.textSecondary,
         marginBottom: 32,
     },
     formContainer: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     inputOutline: {
-        borderRadius: 12, // Bordes redondeados del input
+        borderRadius: 12,
         borderColor: '#E0E0E0',
     },
     passwordHeader: {
@@ -146,12 +146,12 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     forgotPassword: {
-        color: '#5c5cff',
+        color: COLORS.primary,
         fontWeight: '600',
         fontSize: 12,
     },
     loginButton: {
-        backgroundColor: '#5c5cff',
+        backgroundColor: COLORS.primary,
         borderRadius: 12,
         marginTop: 10,
         marginBottom: 24,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     registerLink: {
-        color: '#5c5cff',
+        color: COLORS.primary,
         fontWeight: 'bold',
     },
 })

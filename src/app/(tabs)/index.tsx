@@ -1,76 +1,70 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Card } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
+import CustomAppBar from '../../components/CustomAppBar';
+import { COLORS } from '../../constants/theme';
 
 export default function HomeScreen() {
-    const router = useRouter();
-
     return (
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
+            <CustomAppBar title="Inicio" />
+
             <View style={styles.content}>
-                <Text variant="headlineMedium" style={styles.welcomeText}>
-                    Bienvenido
-                </Text>
-                <Text variant="bodyLarge" style={styles.subtitle}>
-                    Panel de Gestión
-                </Text>
-
-                {/* Card para navegar a Clientes */}
-                <Card
-                    style={styles.card}
-                    onPress={() => router.push('/(tabs)/clientes')}
-                >
-                    <Card.Content>
-                        <View style={styles.cardContent}>
-                            <Text variant="titleLarge" style={styles.cardTitle}>
-                                👥 Clientes
-                            </Text>
-                            <Text variant="bodyMedium" style={styles.cardSubtitle}>
-                                Gestiona tus clientes
-                            </Text>
-                        </View>
-                    </Card.Content>
-                </Card>
-
-                { }
+                {/* Logo */}
+                <View style={styles.logoContainer}>
+                    <View style={styles.logoCircle}>
+                        <Text style={styles.logoText}>📊</Text>
+                    </View>
+                    <Text variant="headlineLarge" style={styles.appName}>
+                        GestorPro
+                    </Text>
+                    <Text variant="bodyMedium" style={styles.subtitle}>
+                        Sistema de Gestión Empresarial
+                    </Text>
+                </View>
             </View>
-        </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#f5f5f5',
     },
     content: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
         padding: 20,
     },
-    welcomeText: {
-        color: '#1a1b4b',
+    logoContainer: {
+        alignItems: 'center',
+    },
+    logoCircle: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: COLORS.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+        elevation: 8,
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+    },
+    logoText: {
+        fontSize: 60,
+    },
+    appName: {
+        color: COLORS.primary,
         fontWeight: 'bold',
         marginBottom: 8,
     },
     subtitle: {
-        color: '#7e7e7e',
-        marginBottom: 30,
+        color: COLORS.textSecondary,
+        textAlign: 'center',
     },
-    card: {
-        marginBottom: 16,
-        backgroundColor: '#fff',
-        elevation: 2,
-    },
-    cardContent: {
-        paddingVertical: 10,
-    },
-    cardTitle: {
-        color: '#5c5cff',
-        fontWeight: 'bold',
-        marginBottom: 4,
-    },
-    cardSubtitle: {
-        color: '#666',
-    }
 });

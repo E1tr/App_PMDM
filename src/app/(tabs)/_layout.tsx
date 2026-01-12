@@ -2,7 +2,11 @@ import { Tabs } from 'expo-router';
 
 export default function TabsLayout() {
     return (
-        <Tabs screenOptions={{ headerShown: false }}>
+        <Tabs
+            screenOptions={{
+                headerShown: false
+            }}
+        >
             <Tabs.Screen
                 name="index"
                 options={{
@@ -16,14 +20,6 @@ export default function TabsLayout() {
                 options={{
                     title: 'Clientes',
                     tabBarIcon: ({ color }) => '👥',
-                }}
-            />
-
-            <Tabs.Screen
-                name="otros"
-                options={{
-                    title: 'Tienda',
-                    tabBarIcon: ({ color }) => '🛒',
                 }}
             />
         </Tabs>
