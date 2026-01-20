@@ -6,10 +6,15 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { clientSchema, ClientFormData } from '../../schema/client.schema';
 import { useClientes } from '../../contexts/ClientContext';
+import CustomAppBar from '../../components/CustomAppBar';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function CreateClientScreen() {
     const router = useRouter();
     const { createCliente } = useClientes();
+    const { theme } = useTheme();
+    const colors = theme.colors;
+    const styles = makeStyles(colors);
 
     const { control, handleSubmit, formState: { errors } } = useForm<ClientFormData>({
         resolver: zodResolver(clientSchema),
@@ -31,171 +36,177 @@ export default function CreateClientScreen() {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                <Text variant="headlineMedium" style={styles.headerTitle}>
-                    Nuevo Cliente
-                </Text>
-            </View>
-
-            <View style={styles.form}>
-                {/* Nombre */}
-                <Controller
-                    control={control}
-                    name="nombre"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            label="Nombre *"
-                            value={value}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            error={!!errors.nombre}
-                            style={styles.input}
-                            mode="outlined"
-                            textColor="#000"
-                        />
+        <>
+            <CustomAppBar title="Nuevo Cliente" />
+            <ScrollView style={styles.container}>
+                <View style={styles.form}>
+                    {/* Nombre */}
+                    <Controller
+                        control={control}
+                        name="nombre"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                label="Nombre *"
+                                value={value}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                error={!!errors.nombre}
+                                style={styles.input}
+                                mode="outlined"
+                                outlineColor={colors.border}
+                                activeOutlineColor={colors.primary}
+                                textColor={colors.text}
+                                theme={{ colors: { background: colors.card, placeholder: colors.textSecondary, text: colors.text, primary: colors.primary } }}
+                            />
+                        )}
+                    />
+                    {errors.nombre && (
+                        <Text style={styles.errorText}>{errors.nombre.message}</Text>
                     )}
-                />
-                {errors.nombre && (
-                    <Text style={styles.errorText}>{errors.nombre.message}</Text>
-                )}
 
-                {/* Email */}
-                <Controller
-                    control={control}
-                    name="email"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            label="Email"
-                            value={value}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            error={!!errors.email}
-                            style={styles.input}
-                            mode="outlined"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            textColor="#000"
-                        />
+                    {/* Email */}
+                    <Controller
+                        control={control}
+                        name="email"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                label="Email"
+                                value={value}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                error={!!errors.email}
+                                style={styles.input}
+                                mode="outlined"
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                outlineColor={colors.border}
+                                activeOutlineColor={colors.primary}
+                                textColor={colors.text}
+                                theme={{ colors: { background: colors.card, placeholder: colors.textSecondary, text: colors.text } }}
+                            />
+                        )}
+                    />
+                    {errors.email && (
+                        <Text style={styles.errorText}>{errors.email.message}</Text>
                     )}
-                />
-                {errors.email && (
-                    <Text style={styles.errorText}>{errors.email.message}</Text>
-                )}
 
-                {/* Teléfono */}
-                <Controller
-                    control={control}
-                    name="telefono"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            label="Teléfono"
-                            value={value}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            error={!!errors.telefono}
-                            style={styles.input}
-                            mode="outlined"
-                            keyboardType="phone-pad"
-                            textColor="#000"
-                        />
+                    {/* Teléfono */}
+                    <Controller
+                        control={control}
+                        name="telefono"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                label="Teléfono"
+                                value={value}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                error={!!errors.telefono}
+                                style={styles.input}
+                                mode="outlined"
+                                keyboardType="phone-pad"
+                                outlineColor={colors.border}
+                                activeOutlineColor={colors.primary}
+                                textColor={colors.text}
+                                theme={{ colors: { background: colors.card, placeholder: colors.textSecondary, text: colors.text } }}
+                            />
+                        )}
+                    />
+                    {errors.telefono && (
+                        <Text style={styles.errorText}>{errors.telefono.message}</Text>
                     )}
-                />
-                {errors.telefono && (
-                    <Text style={styles.errorText}>{errors.telefono.message}</Text>
-                )}
 
-                {/* NIF/CIF */}
-                <Controller
-                    control={control}
-                    name="nifCif"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            label="NIF/CIF"
-                            value={value}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            error={!!errors.nifCif}
-                            style={styles.input}
-                            mode="outlined"
-                            textColor="#000"
-                        />
+                    {/* NIF/CIF */}
+                    <Controller
+                        control={control}
+                        name="nifCif"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                label="NIF/CIF"
+                                value={value}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                error={!!errors.nifCif}
+                                style={styles.input}
+                                mode="outlined"
+                                outlineColor={colors.border}
+                                activeOutlineColor={colors.primary}
+                                textColor={colors.text}
+                                theme={{ colors: { background: colors.card, placeholder: colors.textSecondary, text: colors.text } }}
+                            />
+                        )}
+                    />
+                    {errors.nifCif && (
+                        <Text style={styles.errorText}>{errors.nifCif.message}</Text>
                     )}
-                />
-                {errors.nifCif && (
-                    <Text style={styles.errorText}>{errors.nifCif.message}</Text>
-                )}
 
-                {/* Notas */}
-                <Controller
-                    control={control}
-                    name="notas"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            label="Notas"
-                            value={value}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            error={!!errors.notas}
-                            style={styles.input}
-                            mode="outlined"
-                            multiline
-                            numberOfLines={4}
-                            textColor="#000"
-                        />
+                    {/* Notas */}
+                    <Controller
+                        control={control}
+                        name="notas"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                label="Notas"
+                                value={value}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                error={!!errors.notas}
+                                style={styles.input}
+                                mode="outlined"
+                                multiline
+                                numberOfLines={4}
+                                outlineColor={colors.border}
+                                activeOutlineColor={colors.primary}
+                                textColor={colors.text}
+                                theme={{ colors: { background: colors.card, placeholder: colors.textSecondary, text: colors.text } }}
+                            />
+                        )}
+                    />
+                    {errors.notas && (
+                        <Text style={styles.errorText}>{errors.notas.message}</Text>
                     )}
-                />
-                {errors.notas && (
-                    <Text style={styles.errorText}>{errors.notas.message}</Text>
-                )}
 
-                {/* Botones */}
-                <View style={styles.buttonContainer}>
-                    <Button
-                        mode="contained"
-                        onPress={handleSubmit(onSubmit)}
-                        style={styles.saveButton}
-                        icon="content-save"
-                    >
-                        Guardar
-                    </Button>
+                    {/* Botones */}
+                    <View style={styles.buttonContainer}>
+                        <Button
+                            mode="contained"
+                            onPress={handleSubmit(onSubmit)}
+                            style={styles.saveButton}
+                            icon="content-save"
+                            buttonColor={colors.primary}
+                            textColor={colors.white}
+                        >
+                            Guardar
+                        </Button>
 
-                    <Button
-                        mode="outlined"
-                        onPress={() => router.back()}
-                        style={styles.cancelButton}
-                    >
-                        Cancelar
-                    </Button>
+                        <Button
+                            mode="outlined"
+                            onPress={() => router.back()}
+                            style={styles.cancelButton}
+                            textColor={colors.textSecondary}
+                        >
+                            Cancelar
+                        </Button>
+                    </View>
                 </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </>
     );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: any) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
-    },
-    header: {
-        backgroundColor: '#5c5cff',
-        padding: 20,
-        paddingTop: 50,
-    },
-    headerTitle: {
-        color: '#000',
-        fontWeight: 'bold',
+        backgroundColor: colors.background,
     },
     form: {
         padding: 16,
     },
     input: {
         marginBottom: 8,
-        backgroundColor: '#fff',
+        backgroundColor: colors.card,
     },
     errorText: {
-        color: '#f44336',
+        color: colors.error,
         fontSize: 12,
         marginBottom: 12,
         marginLeft: 12,
@@ -205,9 +216,9 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     saveButton: {
-        backgroundColor: '#5c5cff',
+        // backgroundColor managed by theme
     },
     cancelButton: {
-        borderColor: '#999',
+        borderColor: colors.textSecondary,
     },
 });

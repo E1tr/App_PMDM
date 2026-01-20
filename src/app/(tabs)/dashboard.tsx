@@ -2,9 +2,14 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import CustomAppBar from '../../components/CustomAppBar';
-import { COLORS } from '../../constants/theme';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function HomeScreen() {
+    const { theme } = useTheme();
+    const colors = theme.colors;
+
+    const styles = makeStyles(colors);
+
     return (
         <View style={styles.container}>
             <CustomAppBar title="Inicio" />
@@ -27,10 +32,10 @@ export default function HomeScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: any) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: colors.background,
     },
     content: {
         flex: 1,
@@ -45,12 +50,12 @@ const styles = StyleSheet.create({
         width: 120,
         height: 120,
         borderRadius: 60,
-        backgroundColor: COLORS.primary,
+        backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
         elevation: 8,
-        shadowColor: COLORS.primary,
+        shadowColor: colors.primary,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -59,12 +64,12 @@ const styles = StyleSheet.create({
         fontSize: 60,
     },
     appName: {
-        color: COLORS.primary,
+        color: colors.primary,
         fontWeight: 'bold',
         marginBottom: 8,
     },
     subtitle: {
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         textAlign: 'center',
     },
 });

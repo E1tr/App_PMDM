@@ -17,6 +17,7 @@ export interface User {
   roleId: number;
   name: string;
   email: string;
+  password?: string;
 }
 
 export type EstadoPedido =
@@ -142,12 +143,14 @@ export const usuarios: User[] = [
     roleId: 2,
     name: 'Admin Principal',
     email: 'admin@alquilerapp.com',
+    password: '123',
   },
   {
     id: 2,
     roleId: 1,
     name: 'Operario 1',
     email: 'operario1@alquilerapp.com',
+    password: '123'
   },
 ];
 

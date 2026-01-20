@@ -6,7 +6,7 @@ interface ClientContextType {
     getClientes: () => Cliente[];
     getClienteById: (id: number) => Cliente | undefined;
     getClientePedidos: (clienteId: number) => any[]; // Devuelve los pedidos del cliente
-    createCliente: (cliente: Omit<Cliente, 'id'>) => Cliente;
+     createCliente: (cliente: Omit<Cliente, 'id'>) => Cliente;
     updateCliente: (id: number, data: Partial<Omit<Cliente, 'id'>>) => void;
     deleteCliente: (id: number) => void;
     searchClientes: (query: string) => Cliente[];

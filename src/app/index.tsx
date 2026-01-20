@@ -3,13 +3,19 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { TextInput, Button, Text, Avatar, Divider } from 'react-native-paper'
 import { useRouter } from 'expo-router';
 import { COLORS } from '../constants/theme';
-
+import { Alert } from 'react-native';
+import { usuarios } from '../types/types';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function LogInScreen({ navigation }: any) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
+    const { theme } = useTheme();
+    const colors = theme.colors;
+    const styles = makeStyles(colors);
+
 
 
     return (
@@ -19,7 +25,7 @@ export default function LogInScreen({ navigation }: any) {
                     size={80}
                     icon="lock-outline"
                     style={styles.avatar}
-                    color={COLORS.primary}
+                    color={colors.primary}
                 />
 
             </View>
@@ -33,10 +39,9 @@ export default function LogInScreen({ navigation }: any) {
                     label='Email'
                     value={email}
                     onChangeText={text => setEmail(text)}
-                    outlineStyle={styles.input}
                     style={styles.input}
-                    left={<TextInput.Icon icon="email-outline" color="#aaa" />}
-                    theme={{ colors: { primary: COLORS.primary, outline: '#E0E0E0' } }}
+                    left={<TextInput.Icon icon="email-outline" color={colors.textSecondary} />}
+                    theme={{ colors: { primary: colors.primary, outline: colors.primary } }}
                 />
                 <View style={styles.passwordHeader}>
                     <Text style={styles.label}>Contraseña</Text>
@@ -50,22 +55,29 @@ export default function LogInScreen({ navigation }: any) {
                     onChangeText={text => setPassword(text)}
                     secureTextEntry={!showPassword}
                     style={styles.input}
-                    left={<TextInput.Icon icon="lock-outline" color="#aaa" />}
+                    left={<TextInput.Icon icon="lock-outline" color={colors.textSecondary} />}
                     right={
                         <TextInput.Icon
                             icon={showPassword ? "eye-off" : "eye"}
                             onPress={() => setShowPassword(!showPassword)}
-                            color="#aaa"
+                            color={colors.textSecondary}
                         />
                     }
-                    theme={{ colors: { primary: COLORS.primary, outline: '#E0E0E0' } }}
+                    theme={{ colors: { primary: colors.primary, outline: colors.primary } }}
                 />
             </View>
 
 
             <Button
                 mode='contained'
-                onPress={() => { router.replace('/(tabs)') }}
+                onPress={() => {
+                    const usuarioEncontrado = usuarios.find(u => u.email === email && u.password === password);
+                    if (usuarioEncontrado) {
+                        router.replace('/(tabs)/dashboard');
+                    } else {
+                        Alert.alert('Error de acceso', 'Correo o contraseña incorrectos');
+                    }
+                }}
                 style={styles.loginButton}
                 contentStyle={{ height: 50 }}
             >
@@ -98,12 +110,12 @@ export default function LogInScreen({ navigation }: any) {
 }
 
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: any) => StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
         padding: 24,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     headerContainer: {
         alignItems: 'center',
@@ -115,12 +127,12 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'center',
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: 8,
     },
     subtitle: {
         textAlign: 'center',
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: 32,
     },
     formContainer: {
@@ -132,7 +144,7 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     input: {
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
         marginBottom: 16,
         fontSize: 14,
     },
@@ -146,12 +158,12 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     forgotPassword: {
-        color: COLORS.primary,
+        color: colors.primary,
         fontWeight: '600',
         fontSize: 12,
     },
     loginButton: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: colors.primary,
         borderRadius: 12,
         marginTop: 10,
         marginBottom: 24,
@@ -163,11 +175,11 @@ const styles = StyleSheet.create({
     },
     divider: {
         flex: 1,
-        backgroundColor: '#E0E0E0',
+        backgroundColor: colors.textSecondary,
     },
     dividerText: {
         marginHorizontal: 10,
-        color: '#888',
+        color: colors.textSecondary,
         fontSize: 12,
     },
     googleButton: {
@@ -181,7 +193,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     registerLink: {
-        color: COLORS.primary,
+        color: colors.primary,
         fontWeight: 'bold',
     },
 })

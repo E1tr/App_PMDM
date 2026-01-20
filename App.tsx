@@ -4,7 +4,7 @@ import { PaperProvider } from "react-native-paper";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LogInScreen from "./src/app";
-import HomeScreen from "./src/app/(tabs)";
+import HomeScreen from "./src/app/(tabs)/dashboard";
 
 const Stack = createNativeStackNavigator();
 

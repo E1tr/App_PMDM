@@ -1,17 +1,30 @@
 import { Tabs } from 'expo-router';
+import { useTheme } from '../../contexts/ThemeContext';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function TabsLayout() {
+    const { theme } = useTheme();
+    const colors = theme.colors;
+
     return (
         <Tabs
             screenOptions={{
-                headerShown: false
+                headerShown: false,
+                tabBarStyle: {
+                    backgroundColor: colors.card,
+                    borderTopColor: colors.border,
+                },
+                tabBarActiveTintColor: colors.primary,
+                tabBarInactiveTintColor: colors.textSecondary,
             }}
         >
             <Tabs.Screen
-                name="index"
+                name="dashboard"
                 options={{
                     title: 'Inicio',
-                    tabBarIcon: ({ color }) => '🏠',
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="view-dashboard" size={size} color={color} />
+                    ),
                 }}
             />
 
@@ -19,7 +32,9 @@ export default function TabsLayout() {
                 name="clientes"
                 options={{
                     title: 'Clientes',
-                    tabBarIcon: ({ color }) => '👥',
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="account-group" size={size} color={color} />
+                    ),
                 }}
             />
         </Tabs>
