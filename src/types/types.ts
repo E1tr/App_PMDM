@@ -146,6 +146,13 @@ export const usuarios: User[] = [
     password: '123',
   },
   {
+    id: 3,
+    roleId: 2,
+    name: "Prueba",
+    email: 'a@a.com',
+    password: '123'
+  },
+  {
     id: 2,
     roleId: 1,
     name: 'Operario 1',

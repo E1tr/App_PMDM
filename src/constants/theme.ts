@@ -3,15 +3,15 @@
 export const lightTheme = {
     dark: false,
     colors: {
-        primary: '#694381ff',       // Un morado "Google Material" vibrante pero serio
-        background: '#F9FAFB',    // No es blanco puro, es un gris muy sutil para descansar la vista
-        card: '#FFFFFF',          // Las tarjetas sí son blancas puras para resaltar
-        text: '#111827',          // Negro casi puro (Charcoal) para lectura perfecta
-        textSecondary: '#6B7280', // Gris medio equilibrado
-        border: '#E5E7EB',        // Bordes muy suaves
-        error: '#EF4444',         // Rojo moderno
-        success: '#10B981',       // Verde esmeralda
-        accent: '#F59E0B',        // Ámbar suave
+        primary: '#7C3AED',       // Un violeta "Slate" más saturado y moderno (Violet 600)
+        background: '#F8FAFC',    // Slate 50: Más limpio y profesional que el gris anterior
+        card: '#FFFFFF',
+        text: '#0F172A',          // Slate 900: El azul oscuro profundo que define tu marca
+        textSecondary: '#475569', // Slate 600: Mucho más integrado en la estética
+        border: '#CBD5E1',        // Slate 300: Bordes que se ven, pero no molestan
+        error: '#DC2626',
+        success: '#059669',
+        accent: '#8B5CF6',        // Un morado más claro para interacción
         surface: '#FFFFFF',
         white: '#FFFFFF',
     }
@@ -20,19 +20,18 @@ export const lightTheme = {
 export const darkTheme = {
     dark: true,
     colors: {
-        primary: '#C084FC',       // Un lavanda brillante que destaca sobre negro
-        background: '#0F172A',    // "Slate 900" - Un azul muy oscuro, mucho más elegante que el negro puro
-        card: '#1E293B',          // "Slate 800" - Un tono más claro para diferenciar capas
-        text: '#F3F4F6',          // Blanco roto (muy legible)
-        textSecondary: '#94A3B8', // Gris azulado suave
-        border: '#334155',        // Bordes sutiles que encajan con el fondo
-        error: '#F87171',         // Rojo pastel (menos agresivo en oscuro)
-        success: '#34D399',       // Verde menta neón
-        accent: '#FBBF24',        // Dorado brillante
-        surface: '#1E293B',
+        primary: '#A78BFA',       // Violeta suave que no "quema" en la oscuridad
+        background: '#020617',    // Un Slate mucho más profundo, casi negro pero con alma azul
+        card: '#0F172A',          // Slate 900 para las tarjetas (hace pop sobre el fondo)
+        text: '#F1F5F9',          // Slate 100: Máxima legibilidad
+        textSecondary: '#94A3B8', // Slate 400
+        border: '#1E293B',        // Slate 800 para bordes invisibles pero definidos
+        error: '#FB7185',
+        success: '#34D399',
+        accent: '#DDD6FE',
+        surface: '#0F172A',
         white: '#FFFFFF',
     }
 };
 
-// Mantenemos compatibilidad
 export const COLORS = lightTheme.colors;
