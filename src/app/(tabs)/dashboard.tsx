@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, StyleSheet, Image } from 'react-native';
 import { Text } from 'react-native-paper';
 import CustomAppBar from '../../components/CustomAppBar';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -8,23 +8,31 @@ export default function HomeScreen() {
     const { theme } = useTheme();
     const colors = theme.colors;
 
-    const styles = makeStyles(colors);
+    const styles = useMemo(() => makeStyles(colors), [colors]);
 
     return (
         <View style={styles.container}>
             <CustomAppBar title="Inicio" />
 
             <View style={styles.content}>
-                {/* Logo */}
                 <View style={styles.logoContainer}>
-                    <View style={styles.logoCircle}>
-                        <Text style={styles.logoText}>📊</Text>
-                    </View>
+                    <Image
+                        source={require('../../assets/images/logo.png')}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
+
                     <Text variant="headlineLarge" style={styles.appName}>
-                        GestorPro
+                        SLATE
                     </Text>
+                    <Text variant="titleMedium" style={styles.appTitle}>
+                        MANAGEMENT
+                    </Text>
+
+                    <View style={styles.divider} />
+
                     <Text variant="bodyMedium" style={styles.subtitle}>
-                        Sistema de Gestión Empresarial
+                        Control total en la palma de tu mano 🗝️
                     </Text>
                 </View>
             </View>
@@ -41,35 +49,39 @@ const makeStyles = (colors: any) => StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        padding: 24,
     },
     logoContainer: {
         alignItems: 'center',
+        width: '100%',
     },
-    logoCircle: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: colors.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
+    logo: {
+        width: 150,
+        height: 150,
         marginBottom: 20,
-        elevation: 8,
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-    },
-    logoText: {
-        fontSize: 60,
     },
     appName: {
         color: colors.primary,
-        fontWeight: 'bold',
-        marginBottom: 8,
+        fontWeight: '900',
+        letterSpacing: 4,
+        fontSize: 36,
+    },
+    appTitle: {
+        color: colors.text,
+        fontWeight: '300',
+        letterSpacing: 2,
+        marginTop: -5,
+    },
+    divider: {
+        height: 3,
+        width: 40,
+        backgroundColor: colors.primary,
+        marginVertical: 15,
+        borderRadius: 2,
     },
     subtitle: {
         color: colors.textSecondary,
         textAlign: 'center',
+        maxWidth: '80%',
     },
 });

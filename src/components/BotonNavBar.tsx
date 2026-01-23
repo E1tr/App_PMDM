@@ -1,25 +1,25 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { IconButton } from 'react-native-paper';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useRouter, usePathname } from 'expo-router';
 
 export default function BottomNavBar() {
-    const navigation = useNavigation();
-    const route = useRoute();
+    const router = useRouter();
+    const pathname = usePathname();
 
     // Función para saber si el icono debe estar activo (color primario) o inactivo (gris)
-    const isActive = (screenName: string) => route.name === screenName;
+    const isActive = (path: string) => pathname === path || pathname.startsWith(path + '/');
 
     return (
         <View style={styles.container}>
             {/* Botón Home */}
             <TouchableOpacity
                 style={styles.tab}
-                onPress={() => navigation.navigate('Home' as never)}
+                onPress={() => router.push('/')}
             >
                 <IconButton
                     icon="home"
-                    iconColor={isActive('Home') ? '#5c5cff' : '#aaa'}
+                    iconColor={isActive('/') && pathname === '/' ? '#5c5cff' : '#aaa'}
                     size={30}
                 />
             </TouchableOpacity>
@@ -27,11 +27,11 @@ export default function BottomNavBar() {
             {/* Botón Gestión Usuarios */}
             <TouchableOpacity
                 style={styles.tab}
-                onPress={() => navigation.navigate('UserManagement' as never)} // Asumiendo que crearás esta pantalla
+                onPress={() => router.push('/user-management')}
             >
                 <IconButton
                     icon="account-group"
-                    iconColor={isActive('UserManagement') ? '#5c5cff' : '#aaa'}
+                    iconColor={isActive('/user-management') ? '#5c5cff' : '#aaa'}
                     size={30}
                 />
             </TouchableOpacity>
@@ -45,10 +45,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderTopWidth: 1,
         borderTopColor: '#E0E0E0',
-        height: 70, // Altura de la barra
+        height: 70,
         alignItems: 'center',
-        justifyContent: 'space-around', // Distribuye los iconos equitativamente
-        paddingBottom: 10, // Espacio para el safe area inferior
+        justifyContent: 'space-around',
+        paddingBottom: 10,
     },
     tab: {
         alignItems: 'center',

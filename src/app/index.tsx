@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native'
-import { TextInput, Button, Text, Avatar, Divider } from 'react-native-paper'
+import { View, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native'
+import { TextInput, Button, Text, Divider } from 'react-native-paper'
 import { useRouter } from 'expo-router';
-import { COLORS } from '../constants/theme';
 import { Alert } from 'react-native';
 import { usuarios } from '../types/types';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LogInScreen({ navigation }: any) {
     const [email, setEmail] = useState('')
@@ -14,12 +14,11 @@ export default function LogInScreen({ navigation }: any) {
     const router = useRouter();
     const { theme } = useTheme();
     const colors = theme.colors;
+    const { login } = useAuth();
     const styles = makeStyles(colors);
 
-
-
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.card}>
                 <View style={styles.headerContainer}>
                     <Image
@@ -73,6 +72,7 @@ export default function LogInScreen({ navigation }: any) {
                     onPress={() => {
                         const usuarioEncontrado = usuarios.find(u => u.email === email && u.password === password);
                         if (usuarioEncontrado) {
+                            login(usuarioEncontrado);
                             router.replace('/(tabs)/dashboard');
                         } else {
                             Alert.alert('Error de acceso', 'Correo o contraseña incorrectos');
@@ -105,25 +105,27 @@ export default function LogInScreen({ navigation }: any) {
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
+        </ScrollView>
     )
 }
 
 
 const makeStyles = (colors: any) => StyleSheet.create({
-    container: {
-        flex: 1,
+    scrollContainer: {
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
+        padding: 20,
         backgroundColor: colors.background,
     },
     card: {
         width: '100%',
         maxWidth: 400,
         backgroundColor: colors.card,
-        borderRadius: 24,
-        padding: 32,
+        borderRadius: 32,
+        borderColor: colors.primary,
+        borderWidth: 1,
+        padding: 24,
         elevation: 8,
         shadowColor: '#000',
         shadowOffset: {
@@ -135,12 +137,9 @@ const makeStyles = (colors: any) => StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
     },
-    avatar: {
-        backgroundColor: '#E8EAF6',
-    },
     logo: {
-        width: 200,
-        height: 200,
+        width: 150,
+        height: 150,
     },
     title: {
         textAlign: 'center',
@@ -159,7 +158,7 @@ const makeStyles = (colors: any) => StyleSheet.create({
     label: {
         fontWeight: '600',
         marginBottom: 8,
-        color: '#333',
+        color: colors.text,
     },
     input: {
         backgroundColor: colors.background,

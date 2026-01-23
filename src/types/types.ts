@@ -18,6 +18,7 @@ export interface User {
   name: string;
   email: string;
   password?: string;
+  avatarUrl?: string;
 }
 
 export type EstadoPedido =
@@ -150,7 +151,8 @@ export const usuarios: User[] = [
     roleId: 2,
     name: "Prueba",
     email: 'a@a.com',
-    password: '123'
+    password: '123',
+    avatarUrl: 'https://i.pravatar.cc/150?u=admin'
   },
   {
     id: 2,
