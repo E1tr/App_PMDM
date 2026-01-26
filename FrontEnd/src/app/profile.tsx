@@ -57,19 +57,43 @@ export default function ProfileScreen() {
                             value={name}
                             onChangeText={setName}
                             mode="outlined"
-                            style={styles.input}
-                            outlineColor={colors.border}
+                            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                            outlineColor={colors.textSecondary}
                             activeOutlineColor={colors.primary}
+                            textColor={colors.text}
+                            placeholderTextColor={colors.textSecondary}
+                            theme={{
+                                colors: {
+                                    background: colors.surface,
+                                    primary: colors.primary,
+                                    text: colors.text,
+                                    onSurface: colors.text,
+                                    placeholder: colors.textSecondary,
+                                    outline: colors.textSecondary,
+                                },
+                            }}
                         />
                         <TextInput
                             label="Correo Electrónico"
                             value={email}
                             onChangeText={setEmail}
                             mode="outlined"
-                            style={styles.input}
-                            outlineColor={colors.border}
+                            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                            outlineColor={colors.textSecondary}
                             activeOutlineColor={colors.primary}
+                            textColor={colors.text}
+                            placeholderTextColor={colors.textSecondary}
                             disabled
+                            theme={{
+                                colors: {
+                                    background: colors.surface,
+                                    primary: colors.primary,
+                                    text: colors.text,
+                                    onSurface: colors.text,
+                                    placeholder: colors.textSecondary,
+                                    outline: colors.textSecondary,
+                                },
+                            }}
                         />
                         <Button
                             mode="contained"
@@ -93,9 +117,21 @@ export default function ProfileScreen() {
                             onChangeText={setCurrentPassword}
                             secureTextEntry
                             mode="outlined"
-                            style={styles.input}
-                            outlineColor={colors.border}
+                            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                            outlineColor={colors.textSecondary}
                             activeOutlineColor={colors.primary}
+                            textColor={colors.text}
+                            placeholderTextColor={colors.textSecondary}
+                            theme={{
+                                colors: {
+                                    background: colors.surface,
+                                    primary: colors.primary,
+                                    text: colors.text,
+                                    onSurface: colors.text,
+                                    placeholder: colors.textSecondary,
+                                    outline: colors.textSecondary,
+                                },
+                            }}
                         />
                         <TextInput
                             label="Nueva Contraseña"
@@ -103,9 +139,21 @@ export default function ProfileScreen() {
                             onChangeText={setNewPassword}
                             secureTextEntry
                             mode="outlined"
-                            style={styles.input}
-                            outlineColor={colors.border}
+                            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                            outlineColor={colors.textSecondary}
                             activeOutlineColor={colors.primary}
+                            textColor={colors.text}
+                            placeholderTextColor={colors.textSecondary}
+                            theme={{
+                                colors: {
+                                    background: colors.surface,
+                                    primary: colors.primary,
+                                    text: colors.text,
+                                    onSurface: colors.text,
+                                    placeholder: colors.textSecondary,
+                                    outline: colors.textSecondary,
+                                },
+                            }}
                         />
                         <Button
                             mode="outlined"
@@ -156,6 +204,8 @@ const styles = StyleSheet.create({
     },
     input: {
         marginBottom: 15,
+        backgroundColor: 'transparent',
+        borderRadius: 12,
     },
     button: {
         marginTop: 10,

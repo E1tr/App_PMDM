@@ -39,8 +39,20 @@ export default function LogInScreen({ navigation }: any) {
                         value={email}
                         onChangeText={text => setEmail(text)}
                         style={styles.input}
+                        mode="outlined"
                         left={<TextInput.Icon icon="email-outline" color={colors.textSecondary} />}
-                        theme={{ colors: { primary: colors.primary, outline: colors.primary } }}
+                        outlineColor={colors.border}
+                        activeOutlineColor={colors.primary}
+                        theme={{
+                            colors: {
+                                background: colors.surface,
+                                primary: colors.primary,
+                                text: colors.text,
+                                onSurface: colors.text,
+                                placeholder: colors.textSecondary,
+                                outline: colors.border,
+                            },
+                        }}
                     />
                     <View style={styles.passwordHeader}>
                         <Text style={styles.label}>Contraseña</Text>
@@ -54,6 +66,7 @@ export default function LogInScreen({ navigation }: any) {
                         onChangeText={text => setPassword(text)}
                         secureTextEntry={!showPassword}
                         style={styles.input}
+                        mode="outlined"
                         left={<TextInput.Icon icon="lock-outline" color={colors.textSecondary} />}
                         right={
                             <TextInput.Icon
@@ -62,7 +75,18 @@ export default function LogInScreen({ navigation }: any) {
                                 color={colors.textSecondary}
                             />
                         }
-                        theme={{ colors: { primary: colors.primary, outline: colors.primary } }}
+                        outlineColor={colors.border}
+                        activeOutlineColor={colors.primary}
+                        theme={{
+                            colors: {
+                                background: colors.surface,
+                                primary: colors.primary,
+                                text: colors.text,
+                                onSurface: colors.text,
+                                placeholder: colors.textSecondary,
+                                outline: colors.border,
+                            },
+                        }}
                     />
                 </View>
 
@@ -161,9 +185,12 @@ const makeStyles = (colors: any) => StyleSheet.create({
         color: colors.text,
     },
     input: {
-        backgroundColor: colors.background,
+        backgroundColor: colors.surface,
         marginBottom: 16,
         fontSize: 14,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     inputOutline: {
         borderRadius: 12,
