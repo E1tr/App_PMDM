@@ -1,20 +1,40 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useClientes } from '../contexts/ClientContext';
+import { Pedido } from '../types/types';
 
 export const useClientDetail = () => {
     const router = useRouter();
     const { id } = useLocalSearchParams();
-    const { getClienteById, getClientePedidos, deleteCliente } = useClientes();
+    const { getClienteById, fetchClientePedidos, deleteCliente } = useClientes();
     const [dialogVisible, setDialogVisible] = useState(false);
+    const [pedidos, setPedidos] = useState<Pedido[]>([]);
 
     const clienteId = Number(id);
     const cliente = getClienteById(clienteId);
-    const pedidos = getClientePedidos(clienteId);
 
-    const handleDelete = () => {
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadPedidos = async () => {
+            const data = await fetchClientePedidos(clienteId);
+            if (isMounted) {
+                setPedidos(data);
+            }
+        };
+
+        if (!Number.isNaN(clienteId)) {
+            loadPedidos();
+        }
+
+        return () => {
+            isMounted = false;
+        };
+    }, [clienteId, fetchClientePedidos]);
+
+    const handleDelete = async () => {
         if (cliente) {
-            deleteCliente(cliente.id);
+            await deleteCliente(cliente.id);
             setDialogVisible(false);
             router.back();
         }

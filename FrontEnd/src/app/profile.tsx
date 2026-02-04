@@ -43,7 +43,7 @@ export default function ProfileScreen() {
                         {name}
                     </Text>
                     <Text variant="bodyMedium" style={{ color: colors.textSecondary }}>
-                        {user.roleId === 2 ? 'Administrador Slate' : 'Gestor de Alquileres'}
+                        {user.role === 'ADMIN' ? 'Administrador Slate' : 'Gestor de Alquileres'}
                     </Text>
                 </View>
 

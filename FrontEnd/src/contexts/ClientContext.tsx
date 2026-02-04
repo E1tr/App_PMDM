@@ -1,14 +1,17 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Cliente, clientes as clientesMock, pedidos } from '../types/types';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { Cliente, Pedido } from '../types/types';
+import { supabase } from '../lib/supabase';
 
 interface ClientContextType {
     clientes: Cliente[];
+    isLoading: boolean;
+    refreshClientes: () => Promise<void>;
     getClientes: () => Cliente[];
     getClienteById: (id: number) => Cliente | undefined;
-    getClientePedidos: (clienteId: number) => any[]; // Devuelve los pedidos del cliente
-     createCliente: (cliente: Omit<Cliente, 'id'>) => Cliente;
-    updateCliente: (id: number, data: Partial<Omit<Cliente, 'id'>>) => void;
-    deleteCliente: (id: number) => void;
+    fetchClientePedidos: (clienteId: number) => Promise<Pedido[]>;
+    createCliente: (cliente: Omit<Cliente, 'id'>) => Promise<Cliente>;
+    updateCliente: (id: number, data: Partial<Omit<Cliente, 'id'>>) => Promise<void>;
+    deleteCliente: (id: number) => Promise<void>;
     searchClientes: (query: string) => Cliente[];
 }
 
@@ -27,7 +30,52 @@ interface ClientProviderProps {
 }
 
 export const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
-    const [clientes, setClientes] = useState<Cliente[]>(clientesMock);
+    const [clientes, setClientes] = useState<Cliente[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const mapCliente = (row: any): Cliente => ({
+        id: row.id,
+        nombre: row.nombre,
+        nifCif: row.nif_cif ?? undefined,
+        telefono: row.telefono ?? undefined,
+        email: row.email ?? undefined,
+        notas: row.notas ?? undefined,
+        activo: row.activo,
+    });
+
+    const mapPedido = (row: any): Pedido => ({
+        id: row.id,
+        codigo: row.codigo,
+        clienteId: row.cliente_id,
+        direccionEntregaId: row.direccion_entrega_id ?? undefined,
+        direccionRecogidaId: row.direccion_recogida_id ?? undefined,
+        fechaInicio: row.fecha_inicio,
+        fechaFin: row.fecha_fin,
+        estado: row.estado,
+        creadoPor: row.creado_por,
+        notas: row.notas ?? undefined,
+    });
+
+    const refreshClientes = useCallback(async () => {
+        setIsLoading(true);
+        const { data, error } = await supabase
+            .from('clientes')
+            .select('*')
+            .order('nombre', { ascending: true });
+
+        if (error) {
+            console.error('Error al cargar clientes:', error);
+            setIsLoading(false);
+            return;
+        }
+
+        setClientes((data ?? []).map(mapCliente));
+        setIsLoading(false);
+    }, []);
+
+    useEffect(() => {
+        refreshClientes();
+    }, [refreshClientes]);
 
     const getClientes = (): Cliente[] => {
         return clientes.filter(c => c.activo);
@@ -37,32 +85,87 @@ export const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
         return clientes.find(cliente => cliente.id === id);
     };
 
-    const getClientePedidos = (clienteId: number) => {
-        return pedidos.filter(pedido => pedido.clienteId === clienteId)
-            .sort((a, b) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime())
-            .slice(0, 5); // Los 5 pedidos más recientes
+    const fetchClientePedidos = async (clienteId: number): Promise<Pedido[]> => {
+        const { data, error } = await supabase
+            .from('pedidos')
+            .select('id, codigo, cliente_id, direccion_entrega_id, direccion_recogida_id, fecha_inicio, fecha_fin, estado, creado_por, notas')
+            .eq('cliente_id', clienteId)
+            .order('fecha_inicio', { ascending: false })
+            .limit(5);
+
+        if (error) {
+            console.error('Error al cargar pedidos del cliente:', error);
+            return [];
+        }
+
+        return (data ?? []).map(mapPedido);
     };
 
-    const createCliente = (clienteData: Omit<Cliente, 'id'>): Cliente => {
-        const newCliente: Cliente = {
-            ...clienteData,
-            id: Math.max(...clientes.map(c => c.id), 0) + 1,
+    const createCliente = async (clienteData: Omit<Cliente, 'id'>): Promise<Cliente> => {
+        const payload = {
+            nombre: clienteData.nombre,
+            nif_cif: clienteData.nifCif ?? null,
+            telefono: clienteData.telefono ?? null,
+            email: clienteData.email ?? null,
+            notas: clienteData.notas ?? null,
+            activo: clienteData.activo ?? true,
         };
 
+        const { data, error } = await supabase
+            .from('clientes')
+            .insert(payload)
+            .select('*')
+            .single();
+
+        if (error) {
+            console.error('Error al crear cliente:', error);
+            throw error;
+        }
+
+        const newCliente = mapCliente(data);
         setClientes(prevClientes => [...prevClientes, newCliente]);
         return newCliente;
     };
 
-    const updateCliente = (id: number, data: Partial<Omit<Cliente, 'id'>>): void => {
+    const updateCliente = async (id: number, data: Partial<Omit<Cliente, 'id'>>): Promise<void> => {
+        const payload = {
+            ...(data.nombre !== undefined ? { nombre: data.nombre } : {}),
+            ...(data.nifCif !== undefined ? { nif_cif: data.nifCif } : {}),
+            ...(data.telefono !== undefined ? { telefono: data.telefono } : {}),
+            ...(data.email !== undefined ? { email: data.email } : {}),
+            ...(data.notas !== undefined ? { notas: data.notas } : {}),
+            ...(data.activo !== undefined ? { activo: data.activo } : {}),
+        };
+
+        const { data: updated, error } = await supabase
+            .from('clientes')
+            .update(payload)
+            .eq('id', id)
+            .select('*')
+            .single();
+
+        if (error) {
+            console.error('Error al actualizar cliente:', error);
+            throw error;
+        }
+
+        const mapped = mapCliente(updated);
         setClientes(prevClientes =>
-            prevClientes.map(cliente =>
-                cliente.id === id ? { ...cliente, ...data } : cliente
-            )
+            prevClientes.map(cliente => (cliente.id === id ? mapped : cliente))
         );
     };
 
-    const deleteCliente = (id: number): void => {
-        // En lugar de eliminar, marcamos como inactivo
+    const deleteCliente = async (id: number): Promise<void> => {
+        const { error } = await supabase
+            .from('clientes')
+            .update({ activo: false })
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error al eliminar cliente:', error);
+            throw error;
+        }
+
         setClientes(prevClientes =>
             prevClientes.map(cliente =>
                 cliente.id === id ? { ...cliente, activo: false } : cliente
@@ -89,9 +192,11 @@ export const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
 
     const value: ClientContextType = {
         clientes,
+        isLoading,
+        refreshClientes,
         getClientes,
         getClienteById,
-        getClientePedidos,
+        fetchClientePedidos,
         createCliente,
         updateCliente,
         deleteCliente,

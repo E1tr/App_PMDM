@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User } from '../types/types';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { User, RoleName } from '../types/types';
+import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
     user: User | null;
-    login: (userData: User) => void;
-    logout: () => void;
+    login: (email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
     isLoading: boolean;
 }
 
@@ -15,39 +15,78 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Cargar usuario del storage al montar
-    useEffect(() => {
-        const loadUser = async () => {
-            try {
-                const savedUser = await AsyncStorage.getItem('@auth_user');
-                if (savedUser) {
-                    setUser(JSON.parse(savedUser));
-                }
-            } catch (error) {
-                console.error('Error al cargar usuario:', error);
-            } finally {
-                setIsLoading(false);
-            }
+    const buildUserFromSession = useCallback(async (sessionUser: { id: string; email?: string | null }) => {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('role, name, avatar_url')
+            .eq('id', sessionUser.id)
+            .single();
+
+        if (error) {
+            console.error('Error al cargar perfil:', error);
+        }
+
+        const role = (data?.role ?? 'NORMAL') as RoleName;
+
+        const appUser: User = {
+            id: sessionUser.id,
+            role,
+            name: data?.name ?? sessionUser.email ?? 'Usuario',
+            email: sessionUser.email ?? '',
+            avatarUrl: data?.avatar_url ?? undefined,
         };
-        loadUser();
+
+        setUser(appUser);
     }, []);
 
-    const login = async (userData: User) => {
-        try {
-            await AsyncStorage.setItem('@auth_user', JSON.stringify(userData));
-            setUser(userData);
-        } catch (error) {
-            console.error('Error al guardar usuario:', error);
+    useEffect(() => {
+        const loadSession = async () => {
+            const { data, error } = await supabase.auth.getSession();
+            if (error) {
+                console.error('Error al recuperar sesión:', error);
+                setIsLoading(false);
+                return;
+            }
+
+            if (data.session?.user) {
+                await buildUserFromSession(data.session.user);
+            }
+
+            setIsLoading(false);
+        };
+
+        loadSession();
+
+        const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            if (session?.user) {
+                await buildUserFromSession(session.user);
+            } else {
+                setUser(null);
+            }
+        });
+
+        return () => {
+            authListener.subscription.unsubscribe();
+        };
+    }, [buildUserFromSession]);
+
+    const login = async (email: string, password: string) => {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+            throw error;
+        }
+
+        if (data.user) {
+            await buildUserFromSession(data.user);
         }
     };
 
     const logout = async () => {
-        try {
-            await AsyncStorage.removeItem('@auth_user');
-            setUser(null);
-        } catch (error) {
-            console.error('Error al eliminar usuario:', error);
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Error al cerrar sesión:', error);
         }
+        setUser(null);
     };
 
     return (

@@ -27,8 +27,8 @@ export default function CreateClientScreen() {
         }
     });
 
-    const onSubmit = (data: ClientFormData) => {
-        createCliente({
+    const onSubmit = async (data: ClientFormData) => {
+        await createCliente({
             ...data,
             activo: true,
         });

@@ -54,8 +54,8 @@ export default function EditClientScreen() {
         );
     }
 
-    const onSubmit = (data: ClientFormData) => {
-        updateCliente(cliente.id, data);
+    const onSubmit = async (data: ClientFormData) => {
+        await updateCliente(cliente.id, data);
         router.back();
     };
 

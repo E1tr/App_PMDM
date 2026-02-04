@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-nat
 import { TextInput, Button, Text, Divider } from 'react-native-paper'
 import { useRouter } from 'expo-router';
 import { Alert } from 'react-native';
-import { usuarios } from '../types/types';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -93,13 +92,12 @@ export default function LogInScreen({ navigation }: any) {
 
                 <Button
                     mode='contained'
-                    onPress={() => {
-                        const usuarioEncontrado = usuarios.find(u => u.email === email && u.password === password);
-                        if (usuarioEncontrado) {
-                            login(usuarioEncontrado);
+                    onPress={async () => {
+                        try {
+                            await login(email, password);
                             router.replace('/(tabs)/dashboard');
-                        } else {
-                            Alert.alert('Error de acceso', 'Correo o contraseña incorrectos');
+                        } catch (error: any) {
+                            Alert.alert('Error de acceso', error?.message || 'Correo o contraseña incorrectos');
                         }
                     }}
                     style={styles.loginButton}

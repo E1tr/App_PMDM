@@ -13,8 +13,8 @@ export interface Role {
 }
 
 export interface User {
-  id: number;
-  roleId: number;
+  id: string;
+  role: RoleName;
   name: string;
   email: string;
   password?: string;
@@ -78,7 +78,7 @@ export interface Pedido {
   fechaInicio: string; // ISO (YYYY-MM-DD)
   fechaFin: string;    // ISO
   estado: EstadoPedido;
-  creadoPor: number;   // userId
+  creadoPor: string | number;   // userId (uuid en Supabase)
   notas?: string;
 }
 
@@ -104,7 +104,7 @@ export interface HistorialEstadoPedido {
   pedidoId: number;
   estadoAnterior?: EstadoPedido;
   estadoNuevo: EstadoPedido;
-  cambiadoPor: number;   // userId
+  cambiadoPor: string | number;   // userId (uuid en Supabase)
   fechaCambio: string;   // ISO datetime
   observaciones?: string;
 }
@@ -140,23 +140,23 @@ export const roles: Role[] = [
 // Usuarios
 export const usuarios: User[] = [
   {
-    id: 1,
-    roleId: 2,
+    id: '012991fe-4e03-4109-b38b-29e8f5e39712',
+    role: 'ADMIN',
     name: 'Admin Principal',
     email: 'admin@alquilerapp.com',
     password: '123',
   },
   {
-    id: 3,
-    roleId: 2,
+    id: 'd4e28881-16a8-4797-b0b6-8ab3498c1ed5',
+    role: 'ADMIN',
     name: "Prueba",
     email: 'a@a.com',
     password: '123',
     avatarUrl: 'https://i.pravatar.cc/150?u=admin'
   },
   {
-    id: 2,
-    roleId: 1,
+    id: '5cc2947f-2504-41bf-8140-8b34370a85be',
+    role: 'NORMAL',
     name: 'Operario 1',
     email: 'operario1@alquilerapp.com',
     password: '123'
