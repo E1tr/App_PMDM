@@ -1,20 +1,20 @@
-import React, { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native'
-import { TextInput, Button, Text, Divider } from 'react-native-paper'
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { TextInput, Button, Text, Divider } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { Alert } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 
-
-export default function LogInScreen({ navigation }: any) {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+export default function RegisterScreen() {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
     const { theme } = useTheme();
     const colors = theme.colors;
-    const { login } = useAuth();
+    const { register } = useAuth();
     const styles = makeStyles(colors);
 
     return (
@@ -22,24 +22,47 @@ export default function LogInScreen({ navigation }: any) {
             <View style={styles.card}>
                 <View style={styles.headerContainer}>
                     <Image
-                        source={require('../assets/images/logo.png')} // Asegúrate de que la ruta sea correcta
+                        source={require('../assets/images/logo.png')}
                         style={styles.logo}
                         resizeMode="contain"
                     />
-
                 </View>
-                <Text variant='headlineMedium' style={styles.title}>Bienvenido</Text>
-                <Text variant='bodyMedium' style={styles.subtitle}>Introduce tus credenciales para continuar</Text>
 
+                <Text variant="headlineMedium" style={styles.title}>Crear cuenta</Text>
+                <Text variant="bodyMedium" style={styles.subtitle}>Completa tus datos para registrarte</Text>
 
                 <View style={styles.formContainer}>
-                    <Text style={styles.label}>Correo Electronico</Text>
+                    <Text style={styles.label}>Nombre completo</Text>
                     <TextInput
-                        label='Email'
-                        value={email}
-                        onChangeText={text => setEmail(text)}
+                        label="Nombre"
+                        value={name}
+                        onChangeText={setName}
                         style={styles.input}
                         mode="outlined"
+                        left={<TextInput.Icon icon="account-outline" color={colors.textSecondary} />}
+                        outlineColor={colors.border}
+                        activeOutlineColor={colors.primary}
+                        theme={{
+                            colors: {
+                                background: colors.surface,
+                                primary: colors.primary,
+                                text: colors.text,
+                                onSurface: colors.text,
+                                placeholder: colors.textSecondary,
+                                outline: colors.border,
+                            },
+                        }}
+                    />
+
+                    <Text style={styles.label}>Correo Electrónico</Text>
+                    <TextInput
+                        label="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                        style={styles.input}
+                        mode="outlined"
+                        autoCapitalize="none"
+                        keyboardType="email-address"
                         left={<TextInput.Icon icon="email-outline" color={colors.textSecondary} />}
                         outlineColor={colors.border}
                         activeOutlineColor={colors.primary}
@@ -54,16 +77,12 @@ export default function LogInScreen({ navigation }: any) {
                             },
                         }}
                     />
-                    <View style={styles.passwordHeader}>
-                        <Text style={styles.label}>Contraseña</Text>
-                        <TouchableOpacity onPress={() => console.log('Recuperar')}>
-                            <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>
-                        </TouchableOpacity>
-                    </View>
+
+                    <Text style={styles.label}>Contraseña</Text>
                     <TextInput
-                        label='Contraseña'
+                        label="Contraseña"
                         value={password}
-                        onChangeText={text => setPassword(text)}
+                        onChangeText={setPassword}
                         secureTextEntry={!showPassword}
                         style={styles.input}
                         mode="outlined"
@@ -90,30 +109,26 @@ export default function LogInScreen({ navigation }: any) {
                     />
                 </View>
 
-
                 <Button
-                    mode='contained'
+                    mode="contained"
                     onPress={async () => {
                         try {
-                            await login(email, password);
-                            router.replace('/(tabs)/dashboard');
+                            await register(name, email, password);
+                            router.replace('/');
                         } catch (error: any) {
-                            Alert.alert('Error de acceso', error?.message || 'Correo o contraseña incorrectos');
+                            Alert.alert('Error', error?.message || 'No se pudo registrar');
                         }
                     }}
                     style={styles.loginButton}
                     contentStyle={{ height: 50 }}
                 >
-                    Iniciar Sesión
+                    Registrarse
                 </Button>
 
-                <View style={styles.dividerContainer}>
-                    <Divider style={styles.divider} />
-                    <Text style={styles.dividerText}>O continúa con</Text>
-                    <Divider style={styles.divider} />
-                </View>
+
+
                 <Button
-                    mode='outlined'
+                    mode="outlined"
                     icon="google"
                     onPress={() => { }}
                     style={styles.googleButton}
@@ -121,17 +136,11 @@ export default function LogInScreen({ navigation }: any) {
                 >
                     Google
                 </Button>
-                <View style={styles.footer}>
-                    <Text style={{ color: '#666' }}>¿No tienes una cuenta? </Text>
-                    <TouchableOpacity onPress={() => router.push('/register')}>
-                        <Text style={styles.registerLink}>Regístrate ahora</Text>
-                    </TouchableOpacity>
-                </View>
+
             </View>
         </ScrollView>
-    )
+    );
 }
-
 
 const makeStyles = (colors: any) => StyleSheet.create({
     scrollContainer: {
@@ -151,10 +160,7 @@ const makeStyles = (colors: any) => StyleSheet.create({
         padding: 24,
         elevation: 8,
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
+        shadowOffset: { width: 0, height: 4 },
     },
     headerContainer: {
         alignItems: 'center',
@@ -191,52 +197,33 @@ const makeStyles = (colors: any) => StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.border,
     },
-    inputOutline: {
-        borderRadius: 12,
-        borderColor: '#E0E0E0',
-    },
-    passwordHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-    },
-    forgotPassword: {
-        color: colors.primary,
-        fontWeight: '600',
-        fontSize: 12,
-    },
     loginButton: {
-        backgroundColor: colors.primary,
+        marginTop: 8,
         borderRadius: 12,
-        marginTop: 10,
-        marginBottom: 24,
     },
     dividerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 24,
+        marginVertical: 20,
     },
     divider: {
         flex: 1,
-        backgroundColor: colors.textSecondary,
     },
     dividerText: {
-        marginHorizontal: 10,
+        marginHorizontal: 8,
         color: colors.textSecondary,
-        fontSize: 12,
     },
     googleButton: {
         borderRadius: 12,
-        borderColor: '#E0E0E0',
-        marginBottom: 24,
-        paddingVertical: 4,
+        borderColor: colors.border,
     },
     footer: {
+        marginTop: 20,
         flexDirection: 'row',
         justifyContent: 'center',
     },
     registerLink: {
         color: colors.primary,
-        fontWeight: 'bold',
+        fontWeight: '700',
     },
-})
+});

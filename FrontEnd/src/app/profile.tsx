@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Text, TextInput, Button, Avatar, Card } from 'react-native-paper';
 import { useTheme } from '../contexts/ThemeContext';
 import CustomAppBar from '../components/CustomAppBar';
 import { useAuth } from '../contexts/AuthContext';
+import * as ImagePicker from 'expo-image-picker';
+import { supabase } from '../lib/supabase';
+import * as FileSystem from 'expo-file-system/legacy';
+import { decode } from 'base64-arraybuffer';
 
 export default function ProfileScreen() {
     const { theme } = useTheme();
     const colors = theme.colors;
-    const { user } = useAuth();
+    const { user, refreshProfile } = useAuth();
 
     if (!user) return <Text>No hay sesión activa</Text>;
 
@@ -18,10 +22,68 @@ export default function ProfileScreen() {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || 'https://via.placeholder.com/150');
 
     const handleSaveProfile = () => {
         setLoading(true);
         setTimeout(() => setLoading(false), 1500);
+    };
+
+    const uriToArrayBuffer = async (uri: string) => {
+        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: 'base64' });
+        return decode(base64);
+    };
+
+    const pickImage = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permiso denegado', 'Necesitamos acceso a la galería');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            const uri = result.assets[0].uri;
+            const fileExt = uri.split('.').pop() || 'jpg';
+            const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+
+            const fileData = await uriToArrayBuffer(uri);
+
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, fileData, {
+                    contentType: 'image/jpeg',
+                    upsert: true,
+                });
+
+            if (uploadError) {
+                Alert.alert('Error', uploadError.message);
+                return;
+            }
+            const { data: publicUrlData } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+
+            const publicUrl = publicUrlData.publicUrl;
+
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ avatar_url: publicUrl })
+                .eq('id', user.id);
+
+            if (updateError) {
+                Alert.alert('Error', updateError.message);
+                return;
+            }
+
+            setAvatarUrl(publicUrl);
+            await refreshProfile();
+        }
     };
 
     return (
@@ -30,10 +92,10 @@ export default function ProfileScreen() {
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={() => console.log('Cambiar foto')}>
+                    <TouchableOpacity onPress={pickImage}>
                         <Avatar.Image
                             size={100}
-                            source={{ uri: user.avatarUrl || 'https://via.placeholder.com/150' }}
+                            source={{ uri: avatarUrl }}
                         />
                         <View style={[styles.editBadge, { backgroundColor: colors.primary }]}>
                             <Avatar.Icon size={24} icon="camera" color="white" style={{ backgroundColor: 'transparent' }} />

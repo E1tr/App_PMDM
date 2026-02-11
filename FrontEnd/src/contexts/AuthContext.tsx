@@ -6,6 +6,8 @@ interface AuthContextType {
     user: User | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    register: (name: string, email: string, password: string) => Promise<void>;
+    refreshProfile: () => Promise<void>;
     isLoading: boolean;
 }
 
@@ -16,24 +18,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     const buildUserFromSession = useCallback(async (sessionUser: { id: string; email?: string | null }) => {
-        const { data, error } = await supabase
+        const { data: initialProfile, error } = await supabase
             .from('profiles')
             .select('role, name, avatar_url')
             .eq('id', sessionUser.id)
-            .single();
+            .maybeSingle();
+
+        let profile = initialProfile;
 
         if (error) {
             console.error('Error al cargar perfil:', error);
         }
 
-        const role = (data?.role ?? 'NORMAL') as RoleName;
+        if (!profile && sessionUser.id) {
+            const { error: insertError } = await supabase
+                .from('profiles')
+                .upsert({
+                    id: sessionUser.id,
+                    name: sessionUser.email ?? 'Usuario',
+                    role: 'NORMAL',
+                    avatar_url: null,
+                });
+
+            if (insertError) {
+                console.error('Error al crear perfil:', insertError);
+            }
+
+            const { data: createdProfile, error: createdProfileError } = await supabase
+                .from('profiles')
+                .select('role, name, avatar_url')
+                .eq('id', sessionUser.id)
+                .maybeSingle();
+
+            if (createdProfileError) {
+                console.error('Error al recargar perfil:', createdProfileError);
+            }
+
+            profile = createdProfile ?? profile;
+        }
+
+        const role = (profile?.role ?? 'NORMAL') as RoleName;
 
         const appUser: User = {
             id: sessionUser.id,
             role,
-            name: data?.name ?? sessionUser.email ?? 'Usuario',
+            name: profile?.name ?? sessionUser.email ?? 'Usuario',
             email: sessionUser.email ?? '',
-            avatarUrl: data?.avatar_url ?? undefined,
+            avatarUrl: profile?.avatar_url ?? undefined,
         };
 
         setUser(appUser);
@@ -73,10 +104,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const login = async (email: string, password: string) => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
+
             throw error;
         }
 
         if (data.user) {
+            await buildUserFromSession(data.user);
+        }
+    };
+
+    const refreshProfile = async () => {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+            console.error('Error al refrescar usuario:', error);
+            return;
+        }
+
+        if (data.user) {
+            await buildUserFromSession(data.user);
+        }
+    };
+    const register = async (name: string, email: string, password: string) => {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { name, avatar_url: null } },
+        });
+        if (error) {
+            console.log(error);
+            throw error;
+        }
+
+        if (data.user) {
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .upsert({ id: data.user.id, name, role: 'NORMAL', avatar_url: null });
+
+            if (profileError) console.error(profileError);
             await buildUserFromSession(data.user);
         }
     };
@@ -90,7 +154,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+        <AuthContext.Provider value={{ user, login, logout, isLoading, register, refreshProfile }}>
             {children}
         </AuthContext.Provider>
     );
