@@ -35,7 +35,9 @@
           "icon": "./assets/icon.png",
           "color": "#22C55E"
         }
-      ]
+      ],
+      "expo-barcode-scanner",
+      "expo-camera"
     ],
     "extra": {
       "router": {},
