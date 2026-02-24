@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { Cliente, Pedido } from '../types/types';
 import { supabase } from '../lib/supabase';
+import { getAllPushTokens, sendPushNotifications } from '../lib/notifications';
 
 interface ClientContextType {
     clientes: Cliente[];
@@ -124,6 +125,19 @@ export const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
 
         const newCliente = mapCliente(data);
         setClientes(prevClientes => [...prevClientes, newCliente]);
+
+        try {
+            const tokens = await getAllPushTokens();
+            await sendPushNotifications(
+                tokens,
+                'Nuevo Cliente',
+                `Se ha registrado: ${newCliente.nombre}`,
+                { clienteId: newCliente.id }
+            );
+        } catch (notifError) {
+            console.error('Error al enviar notificación:', notifError);
+        }
+
         return newCliente;
     };
 

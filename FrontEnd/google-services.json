@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "740005413503",
+    "project_id": "app-pdmd",
+    "storage_bucket": "app-pdmd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:740005413503:android:c6e2b5ff6d7549996bf54a",
+        "android_client_info": {
+          "package_name": "com.pdmp.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8cZfq43G0ozDECiwXITPag-ZUT8tAt6I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

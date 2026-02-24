@@ -1,0 +1,30 @@
+{
+    "build": {
+        "development": {
+            "distribution": "internal",
+            "android": {
+                "gradleCommand": ":app:assembleDebug"
+            },
+            "ios": {
+                "buildConfiguration": "Debug"
+            }
+        },
+        "preview": {
+            "distribution": "internal",
+            "android": {
+                "gradleCommand": ":app:assembleRelease"
+            }
+        },
+        "production": {
+            "android": {
+                "gradleCommand": ":app:bundleRelease"
+            }
+        }
+    },
+    "cli": {
+        "version": ">= 5.0.0"
+    },
+    "submit": {
+        "production": {}
+    }
+}

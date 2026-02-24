@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native'
+import { View, StyleSheet, TouchableOpacity, Image, ScrollView, Platform } from 'react-native'
 import { TextInput, Button, Text, Divider } from 'react-native-paper'
 import { useRouter } from 'expo-router';
 import { Alert } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+
 
 
 export default function LogInScreen({ navigation }: any) {
@@ -16,6 +17,15 @@ export default function LogInScreen({ navigation }: any) {
     const colors = theme.colors;
     const { login } = useAuth();
     const styles = makeStyles(colors);
+    const [errorMsg, setErrorMsg] = useState('');
+    const translateAuthError = (msg: string) => {
+        const m = msg.toLowerCase();
+        if (m.includes('invalid login credentials')) return 'Correo o contraseña incorrectos';
+        if (m.includes('email not confirmed')) return 'Formato de correo inválido';
+        if (m.includes('password should be at least')) return 'La contraseña es demasiado corta';
+        if (m.includes('already registered')) return 'Ese correo ya está registrado';
+        return 'Error al autenticar';
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -95,10 +105,15 @@ export default function LogInScreen({ navigation }: any) {
                     mode='contained'
                     onPress={async () => {
                         try {
+                            setErrorMsg('');
                             await login(email, password);
                             router.replace('/(tabs)/dashboard');
                         } catch (error: any) {
-                            Alert.alert('Error de acceso', error?.message || 'Correo o contraseña incorrectos');
+                            const msg = translateAuthError(error?.message || '');
+                            setErrorMsg(msg);
+                            if (Platform.OS !== 'web') {
+                                Alert.alert('Error de acceso', msg);
+                            }
                         }
                     }}
                     style={styles.loginButton}
@@ -106,6 +121,7 @@ export default function LogInScreen({ navigation }: any) {
                 >
                     Iniciar Sesión
                 </Button>
+                {errorMsg ? <Text style={{ color: 'red', marginTop: 8 }}>{errorMsg}</Text> : null}
 
                 <View style={styles.dividerContainer}>
                     <Divider style={styles.divider} />

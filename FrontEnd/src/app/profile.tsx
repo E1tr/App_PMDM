@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { Text, TextInput, Button, Avatar, Card } from 'react-native-paper';
 import { useTheme } from '../contexts/ThemeContext';
 import CustomAppBar from '../components/CustomAppBar';
@@ -29,7 +29,11 @@ export default function ProfileScreen() {
         setTimeout(() => setLoading(false), 1500);
     };
 
-    const uriToArrayBuffer = async (uri: string) => {
+    const uriToUpload = async (uri: string) => {
+        if (Platform.OS === 'web') {
+            const res = await fetch(uri);
+            return await res.blob();
+        }
         const base64 = await FileSystem.readAsStringAsync(uri, { encoding: 'base64' });
         return decode(base64);
     };
@@ -52,7 +56,7 @@ export default function ProfileScreen() {
             const fileExt = uri.split('.').pop() || 'jpg';
             const filePath = `${user.id}/${Date.now()}.${fileExt}`;
 
-            const fileData = await uriToArrayBuffer(uri);
+            const fileData = await uriToUpload(uri);
 
             const { error: uploadError } = await supabase.storage
                 .from('avatars')

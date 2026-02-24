@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { User, RoleName } from '../types/types';
 import { supabase } from '../lib/supabase';
+import { registerForPushNotificationsAsync } from '../lib/notifications';
 
 interface AuthContextType {
     user: User | null;
@@ -110,6 +111,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (data.user) {
             await buildUserFromSession(data.user);
+            await registerForPushNotificationsAsync(data.user.id);
         }
     };
 
