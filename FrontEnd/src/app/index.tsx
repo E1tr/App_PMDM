@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, TouchableOpacity, Image, ScrollView, Platform } from 'react-native'
-import { TextInput, Button, Text, Divider } from 'react-native-paper'
+import { TextInput, Button, Text, Divider, Dialog, Portal } from 'react-native-paper'
 import { useRouter } from 'expo-router';
 import { Alert } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 
 
@@ -12,10 +13,11 @@ export default function LogInScreen({ navigation }: any) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false);
+    const [showBiometricDialog, setShowBiometricDialog] = useState(false);
     const router = useRouter();
     const { theme } = useTheme();
     const colors = theme.colors;
-    const { login } = useAuth();
+    const { login, enableBiometric, user, isLoading } = useAuth();
     const styles = makeStyles(colors);
     const [errorMsg, setErrorMsg] = useState('');
     const translateAuthError = (msg: string) => {
@@ -26,6 +28,12 @@ export default function LogInScreen({ navigation }: any) {
         if (m.includes('already registered')) return 'Ese correo ya está registrado';
         return 'Error al autenticar';
     };
+
+    useEffect(() => {
+        if (!isLoading && user) {
+            router.replace('/(tabs)/dashboard');
+        }
+    }, [isLoading, user, router]);
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -107,7 +115,16 @@ export default function LogInScreen({ navigation }: any) {
                         try {
                             setErrorMsg('');
                             await login(email, password);
-                            router.replace('/(tabs)/dashboard');
+
+                            // Preguntar si quiere usar huella
+                            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+                            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+                            if (hasHardware && isEnrolled) {
+                                setShowBiometricDialog(true);
+                            } else {
+                                router.replace('/(tabs)/dashboard');
+                            }
                         } catch (error: any) {
                             const msg = translateAuthError(error?.message || '');
                             setErrorMsg(msg);
@@ -122,6 +139,26 @@ export default function LogInScreen({ navigation }: any) {
                     Iniciar Sesión
                 </Button>
                 {errorMsg ? <Text style={{ color: 'red', marginTop: 8 }}>{errorMsg}</Text> : null}
+
+                <Portal>
+                    <Dialog visible={showBiometricDialog} onDismiss={() => setShowBiometricDialog(false)}>
+                        <Dialog.Title>Autenticación biométrica</Dialog.Title>
+                        <Dialog.Content>
+                            <Text>¿Quieres usar tu huella dactilar para iniciar sesión más rápido la próxima vez?</Text>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={() => {
+                                setShowBiometricDialog(false);
+                                router.replace('/(tabs)/dashboard');
+                            }}>No, gracias</Button>
+                            <Button onPress={async () => {
+                                await enableBiometric();
+                                setShowBiometricDialog(false);
+                                router.replace('/(tabs)/dashboard');
+                            }}>Sí, activar</Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
 
                 <View style={styles.dividerContainer}>
                     <Divider style={styles.divider} />

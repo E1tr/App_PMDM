@@ -1,20 +1,43 @@
-import * as Notifications from 'expo-notifications';
+import type * as ExpoNotifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import { supabase } from './supabase';
 
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowBanner: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true,
-        shouldShowList: true,
-    }),
-});
+const isExpoGo = Constants.appOwnership === 'expo';
+let notificationsModule: typeof ExpoNotifications | null = null;
+let handlerConfigured = false;
+
+const getNotificationsModule = async (): Promise<typeof ExpoNotifications | null> => {
+    if (isExpoGo) return null;
+
+    if (!notificationsModule) {
+        notificationsModule = await import('expo-notifications');
+    }
+
+    if (!handlerConfigured && notificationsModule) {
+        notificationsModule.setNotificationHandler({
+            handleNotification: async () => ({
+                shouldShowBanner: true,
+                shouldPlaySound: true,
+                shouldSetBadge: true,
+                shouldShowList: true,
+            }),
+        });
+        handlerConfigured = true;
+    }
+
+    return notificationsModule;
+};
 
 export async function registerForPushNotificationsAsync(userId: string): Promise<string | null> {
     if (Platform.OS === 'web') {
         console.log('Las notificaciones push no están soportadas en web');
+        return null;
+    }
+
+    if (isExpoGo) {
+        console.log('Expo Go no soporta notificaciones push remotas. Usa un development build.');
         return null;
     }
 
@@ -24,6 +47,9 @@ export async function registerForPushNotificationsAsync(userId: string): Promise
     }
 
     try {
+        const Notifications = await getNotificationsModule();
+        if (!Notifications) return null;
+
         const { status: existingStatus } = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
 
