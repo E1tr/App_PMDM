@@ -3,6 +3,7 @@
     "name": "App_PMDM",
     "slug": "App_PMDM",
     "version": "1.0.0",
+    "scheme": "apppmdm",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

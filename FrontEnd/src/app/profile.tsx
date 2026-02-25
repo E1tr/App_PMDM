@@ -6,7 +6,7 @@ import CustomAppBar from '../components/CustomAppBar';
 import { useAuth } from '../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../lib/supabase';
-import * as FileSystem from 'expo-file-system/legacy';
+import * as FileSystem from 'expo-file-system';
 import { decode } from 'base64-arraybuffer';
 
 export default function ProfileScreen() {

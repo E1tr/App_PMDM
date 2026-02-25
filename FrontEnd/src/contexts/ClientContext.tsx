@@ -76,6 +76,44 @@ export const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
 
     useEffect(() => {
         refreshClientes();
+
+        // Suscripción a cambios en tiempo real
+        const clientesChannel = supabase
+            .channel('clientes_changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'clientes'
+                },
+                (payload) => {
+                    console.log('Cambio detectado en clientes:', payload);
+
+                    if (payload.eventType === 'INSERT') {
+                        const newCliente = mapCliente(payload.new);
+                        setClientes(prev => {
+                            // Evitar duplicados
+                            if (prev.some(c => c.id === newCliente.id)) {
+                                return prev;
+                            }
+                            return [...prev, newCliente];
+                        });
+                    } else if (payload.eventType === 'UPDATE') {
+                        const updatedCliente = mapCliente(payload.new);
+                        setClientes(prev =>
+                            prev.map(c => c.id === updatedCliente.id ? updatedCliente : c)
+                        );
+                    } else if (payload.eventType === 'DELETE') {
+                        setClientes(prev => prev.filter(c => c.id !== payload.old.id));
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(clientesChannel);
+        };
     }, [refreshClientes]);
 
     const getClientes = (): Cliente[] => {
@@ -124,20 +162,7 @@ export const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
         }
 
         const newCliente = mapCliente(data);
-        setClientes(prevClientes => [...prevClientes, newCliente]);
-
-        try {
-            const tokens = await getAllPushTokens();
-            await sendPushNotifications(
-                tokens,
-                'Nuevo Cliente',
-                `Se ha registrado: ${newCliente.nombre}`,
-                { clienteId: newCliente.id }
-            );
-        } catch (notifError) {
-            console.error('Error al enviar notificación:', notifError);
-        }
-
+        // No agregamos localmente - Realtime lo hará automáticamente
         return newCliente;
     };
 
@@ -163,10 +188,7 @@ export const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
             throw error;
         }
 
-        const mapped = mapCliente(updated);
-        setClientes(prevClientes =>
-            prevClientes.map(cliente => (cliente.id === id ? mapped : cliente))
-        );
+        // No actualizamos localmente - Realtime lo hará automáticamente
     };
 
     const deleteCliente = async (id: number): Promise<void> => {

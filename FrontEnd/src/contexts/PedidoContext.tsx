@@ -64,6 +64,44 @@ export const PedidoProvider: React.FC<PedidoProviderProps> = ({ children }) => {
 
     useEffect(() => {
         refreshPedidos();
+
+        // Suscripción a cambios en tiempo real
+        const pedidosChannel = supabase
+            .channel('pedidos_changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'pedidos'
+                },
+                (payload) => {
+                    console.log('Cambio detectado en pedidos:', payload);
+
+                    if (payload.eventType === 'INSERT') {
+                        const newPedido = mapPedido(payload.new);
+                        setPedidos(prev => {
+                            // Evitar duplicados
+                            if (prev.some(p => p.id === newPedido.id)) {
+                                return prev;
+                            }
+                            return [newPedido, ...prev];
+                        });
+                    } else if (payload.eventType === 'UPDATE') {
+                        const updatedPedido = mapPedido(payload.new);
+                        setPedidos(prev =>
+                            prev.map(p => p.id === updatedPedido.id ? updatedPedido : p)
+                        );
+                    } else if (payload.eventType === 'DELETE') {
+                        setPedidos(prev => prev.filter(p => p.id !== payload.old.id));
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(pedidosChannel);
+        };
     }, [refreshPedidos]);
 
     const getPedidos = (): Pedido[] => {
@@ -99,7 +137,7 @@ export const PedidoProvider: React.FC<PedidoProviderProps> = ({ children }) => {
         }
 
         const newPedido = mapPedido(data);
-        setPedidos(prevPedidos => [newPedido, ...prevPedidos]);
+        // No agregamos localmente - Realtime lo hará automáticamente
         return newPedido;
     };
 
@@ -127,10 +165,7 @@ export const PedidoProvider: React.FC<PedidoProviderProps> = ({ children }) => {
             throw error;
         }
 
-        const mapped = mapPedido(updated);
-        setPedidos(prevPedidos =>
-            prevPedidos.map(pedido => (pedido.id === id ? mapped : pedido))
-        );
+        // No actualizamos localmente - Realtime lo hará automáticamente
     };
 
     const deletePedido = async (id: number): Promise<void> => {

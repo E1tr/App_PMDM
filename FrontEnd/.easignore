@@ -1,0 +1,9 @@
+android/.gradle/**
+android/build/**
+android/app/build/**
+android/.cxx/**
+android/*/build/**
+.expo
+node_modules
+*.lock
+**/*.lock
